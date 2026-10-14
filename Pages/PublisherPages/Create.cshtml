@@ -1,0 +1,28 @@
+@page
+@model Rosca_Ilinca_Lab2.Pages.PublisherPages.CreateModel
+
+@{
+    ViewData["Title"] = "Create Publisher";
+}
+
+<h1>Create Publisher</h1>
+
+<h4>Publisher</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div class="form-group">
+                <label asp-for="Publisher.PublisherName" class="control-label"></label>
+                <input asp-for="Publisher.PublisherName" class="form-control" />
+                <span asp-validation-for="Publisher.PublisherName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" /> |
+                <a asp-page="./Index">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@await Html.PartialAsync("../Shared/_ValidationScriptsPartial")
