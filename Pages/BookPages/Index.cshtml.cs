@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,12 +18,18 @@ public class IndexModel : PageModel
 
     public IList<Book> Book { get; set; } = new List<Book>();
 
+    public BookData BookD { get; set; } = new BookData();
+
+    public int BookID { get; set; }
+
+    public int CategoryID { get; set; }
+
     [BindProperty(SupportsGet = true)]
     public int? SelectedAuthorID { get; set; }
 
     public SelectList AuthorsList { get; set; } = default!;
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(int? id, int? categoryID)
     {
         var authors = await _context.Set<Authors>()
             .OrderBy(a => a.LastName)
@@ -43,14 +50,52 @@ public class IndexModel : PageModel
         var books = _context.Book
             .Include(b => b.Authors)
             .Include(b => b.Publisher)
+            .Include(b => b.BookCategories)
+                .ThenInclude(bc => bc.Category)
+            .AsNoTracking()
             .AsQueryable();
 
+        // Pastram filtrarea dupa autor
         if (SelectedAuthorID.HasValue)
         {
             books = books.Where(
                 b => b.AuthorsID == SelectedAuthorID.Value);
         }
 
-        Book = await books.ToListAsync();
+        // Incarcam cartile ordonate dupa titlu
+        Book = await books
+            .OrderBy(b => b.Title)
+            .ToListAsync();
+
+        // Datele necesare pentru punctul 20
+        BookD = new BookData();
+
+        BookD.Books = Book;
+
+        BookD.Categories = new List<Category>();
+
+        BookD.BookCategories = new List<BookCategory>();
+
+        // Selectarea unei carti
+        if (id.HasValue)
+        {
+            BookID = id.Value;
+
+            var selectedBook = BookD.Books
+                .SingleOrDefault(b => b.ID == id.Value);
+
+            if (selectedBook != null)
+            {
+                BookD.Categories = selectedBook.BookCategories?
+                    .Select(bc => bc.Category)
+                    .ToList() ?? new List<Category>();
+            }
+        }
+
+        // Selectarea unei categorii
+        if (categoryID.HasValue)
+        {
+            CategoryID = categoryID.Value;
+        }
     }
 }

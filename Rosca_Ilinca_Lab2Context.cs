@@ -12,4 +12,6 @@ public class Rosca_Ilinca_Lab2Context : DbContext
     public DbSet<Publisher> Publisher { get; set; } = default!;
     public DbSet<Rosca_Ilinca_Lab2.Models.Authors> Authors
     { get; set; } = default!;
+    public DbSet<Category> Category { get; set; } = default!;
+    public DbSet<BookCategory> BookCategory { get; set; } = default!;
 }
