@@ -1,4 +1,3 @@
-
 @page "/"
 @model Rosca_Ilinca_Lab2.Pages.BookPages.IndexModel
 
@@ -14,9 +13,20 @@
     </a>
 </p>
 
-<!-- Filtrare dupa autor -->
-<form method="get" class="mb-3">
-    <div class="form-group">
+<form asp-page="./Index" method="get" class="mb-3">
+    <div class="form-group mb-3">
+        <label for="SearchString">
+            Find by Book Title / Author Name:
+        </label>
+
+        <input type="text"
+               id="SearchString"
+               name="searchString"
+               value="@Model.CurrentFilter"
+               class="form-control" />
+    </div>
+
+    <div class="form-group mb-3">
         <label for="SelectedAuthorID">
             Filter by Author
         </label>
@@ -28,21 +38,36 @@
         </select>
     </div>
 
-    <button type="submit" class="btn btn-primary mt-2">
-        Filter
+    <button type="submit" class="btn btn-primary">
+        Search
     </button>
 
-    <a asp-page="./Index"
-       class="btn btn-secondary mt-2">
-        Reset
+    <a asp-page="./Index" class="btn btn-secondary">
+        Back to full List
     </a>
 </form>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Book Title</th>
-            <th>Author</th>
+            <th>
+                <a asp-page="./Index"
+                   asp-route-sortOrder="@Model.TitleSort"
+                   asp-route-searchString="@Model.CurrentFilter"
+                   asp-route-SelectedAuthorID="@Model.SelectedAuthorID">
+                    Book Title
+                </a>
+            </th>
+
+            <th>
+                <a asp-page="./Index"
+                   asp-route-sortOrder="@Model.AuthorSort"
+                   asp-route-searchString="@Model.CurrentFilter"
+                   asp-route-SelectedAuthorID="@Model.SelectedAuthorID">
+                    Author
+                </a>
+            </th>
+
             <th>Price</th>
             <th>Publishing Date</th>
             <th>Publisher</th>
@@ -118,3 +143,8 @@
         }
     </tbody>
 </table>
+
+@if (Model.Book.Count == 0)
+{
+    <p>Nu au fost găsite cărți pentru filtrele introduse.</p>
+}

@@ -2,41 +2,96 @@
 @model Rosca_Ilinca_Lab2.Pages.CategoryPages.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Categories";
 }
 
-<h1>Index</h1>
+<h1>Categories</h1>
 
 <p>
-    <a asp-page="Create">Create New</a>
+    <a asp-page="./Create" class="btn btn-primary">
+        Create New
+    </a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Category[0].CategoryName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category[0].BookCategories)
-            </th>
-            <th></th>
+            <th>Category Name</th>
+            <th>Actions</th>
         </tr>
     </thead>
+
     <tbody>
-@foreach (var item in Model.Category) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.CategoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.BookCategories)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Category)
+        {
+            string selectedRow = item.ID == Model.SelectedCategoryID
+                ? "table-success"
+                : "";
+
+            <tr class="@selectedRow">
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryName)
+                </td>
+
+                <td>
+                    <a asp-page="./Index"
+                       asp-route-id="@item.ID">Select</a> |
+
+                    <a asp-page="./Edit"
+                       asp-route-id="@item.ID">Edit</a> |
+
+                    <a asp-page="./Details"
+                       asp-route-id="@item.ID">Details</a> |
+
+                    <a asp-page="./Delete"
+                       asp-route-id="@item.ID">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@if (Model.SelectedCategoryID.HasValue)
+{
+    <h3>Cărți din categoria: @Model.SelectedCategoryName</h3>
+
+    @if (Model.SelectedBooks.Count == 0)
+    {
+        <p>Nu există cărți în această categorie.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Titlu</th>
+                    <th>Autor</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var book in Model.SelectedBooks)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => book.Title)
+                        </td>
+
+                        <td>
+                            @if (book.Authors != null)
+                            {
+                                @($"{book.Authors.FirstName} {book.Authors.LastName}")
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <p>
+        <a asp-page="./Index" class="btn btn-secondary">
+            Resetează selecția
+        </a>
+    </p>
+}

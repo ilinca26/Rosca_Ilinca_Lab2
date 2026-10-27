@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -24,12 +23,22 @@ public class IndexModel : PageModel
 
     public int CategoryID { get; set; }
 
+    public string TitleSort { get; set; } = "";
+
+    public string AuthorSort { get; set; } = "";
+
+    public string CurrentFilter { get; set; } = "";
+
     [BindProperty(SupportsGet = true)]
     public int? SelectedAuthorID { get; set; }
 
     public SelectList AuthorsList { get; set; } = default!;
 
-    public async Task OnGetAsync(int? id, int? categoryID)
+    public async Task OnGetAsync(
+        int? id,
+        int? categoryID,
+        string? sortOrder,
+        string? searchString)
     {
         var authors = await _context.Set<Authors>()
             .OrderBy(a => a.LastName)
@@ -47,6 +56,16 @@ public class IndexModel : PageModel
             "FullName",
             SelectedAuthorID);
 
+        TitleSort = string.IsNullOrEmpty(sortOrder)
+            ? "title_desc"
+            : "";
+
+        AuthorSort = sortOrder == "author"
+            ? "author_desc"
+            : "author";
+
+        CurrentFilter = searchString ?? "";
+
         var books = _context.Book
             .Include(b => b.Authors)
             .Include(b => b.Publisher)
@@ -55,28 +74,39 @@ public class IndexModel : PageModel
             .AsNoTracking()
             .AsQueryable();
 
-        // Pastram filtrarea dupa autor
         if (SelectedAuthorID.HasValue)
         {
             books = books.Where(
                 b => b.AuthorsID == SelectedAuthorID.Value);
         }
 
-        // Incarcam cartile ordonate dupa titlu
         Book = await books
             .OrderBy(b => b.Title)
             .ToListAsync();
 
-        // Datele necesare pentru punctul 20
         BookD = new BookData();
 
         BookD.Books = Book;
-
         BookD.Categories = new List<Category>();
-
         BookD.BookCategories = new List<BookCategory>();
 
-        // Selectarea unei carti
+        // Pasul 12: căutare după titlu sau numele autorului.
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            BookD.Books = BookD.Books.Where(b =>
+                (b.Title != null && b.Title.Contains(searchString))
+                ||
+                (b.Authors != null &&
+                    (
+                        (b.Authors.FirstName != null &&
+                         b.Authors.FirstName.Contains(searchString))
+                        ||
+                        (b.Authors.LastName != null &&
+                         b.Authors.LastName.Contains(searchString))
+                    ))
+            );
+        }
+
         if (id.HasValue)
         {
             BookID = id.Value;
@@ -92,10 +122,38 @@ public class IndexModel : PageModel
             }
         }
 
-        // Selectarea unei categorii
         if (categoryID.HasValue)
         {
             CategoryID = categoryID.Value;
         }
+
+        switch (sortOrder)
+        {
+            case "title_desc":
+                BookD.Books = BookD.Books
+                    .OrderByDescending(b => b.Title);
+                break;
+
+            case "author_desc":
+                BookD.Books = BookD.Books
+                    .OrderByDescending(b => b.Authors == null
+                        ? ""
+                        : b.Authors.FirstName + " " + b.Authors.LastName);
+                break;
+
+            case "author":
+                BookD.Books = BookD.Books
+                    .OrderBy(b => b.Authors == null
+                        ? ""
+                        : b.Authors.FirstName + " " + b.Authors.LastName);
+                break;
+
+            default:
+                BookD.Books = BookD.Books
+                    .OrderBy(b => b.Title);
+                break;
+        }
+
+        Book = BookD.Books.ToList();
     }
 }
