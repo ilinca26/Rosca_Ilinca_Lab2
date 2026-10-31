@@ -90,7 +90,7 @@ public class IndexModel : PageModel
         BookD.Categories = new List<Category>();
         BookD.BookCategories = new List<BookCategory>();
 
-        // Pasul 12: căutare după titlu sau numele autorului.
+        
         if (!string.IsNullOrEmpty(searchString))
         {
             BookD.Books = BookD.Books.Where(b =>
