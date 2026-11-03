@@ -14,4 +14,6 @@ public class Rosca_Ilinca_Lab2Context : DbContext
     { get; set; } = default!;
     public DbSet<Category> Category { get; set; } = default!;
     public DbSet<BookCategory> BookCategory { get; set; } = default!;
+    public DbSet<Borrowing> Borrowing { get; set; } = default!;
+    public DbSet<Member> Member { get; set; } = default!;
 }

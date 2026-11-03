@@ -1,0 +1,32 @@
+@page
+@model Rosca_Ilinca_Lab2.Pages.BorrowingPages.DeleteModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Rosca_Ilinca_Lab2.Models.Borrowing</h4>
+    <hr />
+   <dl class="row">
+    <dt class="col-sm-2">Member</dt>
+    <dd class="col-sm-10">@(Model.Borrowing.Member?.FullName ?? "—")</dd>
+
+    <dt class="col-sm-2">Book</dt>
+    <dd class="col-sm-10">@(Model.Borrowing.Book?.Title ?? "—")</dd>
+
+    <dt class="col-sm-2">Author</dt>
+    <dd class="col-sm-10">@(Model.Borrowing.Book?.Authors?.FullName ?? "—")</dd>
+
+    <dt class="col-sm-2">Return date</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(model => model.Borrowing.ReturnDate)</dd>
+</dl>
+    <form method="post">
+        <input type="hidden" asp-for="Borrowing.ID" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
+</div>
