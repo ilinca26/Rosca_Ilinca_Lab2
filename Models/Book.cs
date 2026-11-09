@@ -10,10 +10,17 @@ namespace Rosca_Ilinca_Lab2.Models
 
 
         [Display(Name = "Book Title")]
-        public string Title { get; set; }
+        [Required(ErrorMessage = "Titlul cartii este obligatoriu.")]
+        [StringLength(150, MinimumLength = 3,
+    ErrorMessage = "Titlul trebuie sa aiba intre 3 si 150 de caractere.")]
+        public string Title { get; set; } = string.Empty;
+        
+
         
 
         [Column(TypeName = "decimal(6, 2)")]
+        [Range(0.01, 500)]
+
         public decimal Price { get; set; }
 
         [DataType(DataType.Date)]
